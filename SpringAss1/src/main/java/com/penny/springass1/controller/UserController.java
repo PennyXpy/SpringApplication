@@ -1,22 +1,32 @@
 package com.penny.springass1.controller;
 
+
+import com.penny.springass1.dto.UserDTO;
 import com.penny.springass1.entity.User;
+import com.penny.springass1.mapper.UserMapper;
 import com.penny.springass1.service.UserService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("users")
 public class UserController {
+    private final UserMapper userMapper;
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
+
 
     @GetMapping
     public ResponseEntity<User[]> getUsers(){
@@ -31,9 +41,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> creatNewUser(@RequestBody User user){
-        User newUser = userService.createNewUser(user);
-        return ResponseEntity.ok(newUser);
+    public ResponseEntity<User> creatNewUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            for (FieldError error: bindingResult.getFieldErrors()){
+                System.out.println(error.getField() + " ---" + error.getRejectedValue());
+            }
+            throw new RuntimeException("Bad Request");
+        }
+        return ResponseEntity.ok(userService.createNewUser(userMapper.transfer(userDTO))); // !!!!!!
     }
 
     @PutMapping("/{id}")

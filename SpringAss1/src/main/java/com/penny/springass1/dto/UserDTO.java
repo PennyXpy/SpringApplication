@@ -1,11 +1,12 @@
-package com.penny.springass1.entity;
+package com.penny.springass1.dto;
 
-
+import com.penny.springass1.entity.Address;
+import com.penny.springass1.entity.Company;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-@Data
-public class User {
+@Data // auto initialize  setter and getter
+public class UserDTO {
     private Long id;
     @NotEmpty
     private String name;
@@ -19,6 +20,5 @@ public class User {
     @NotNull
     private String phone;
     private String website;
-    private Company company;
+    private Company company; // 复杂类需要有自己的dto！
 }
-// DTO -- data transfer object
